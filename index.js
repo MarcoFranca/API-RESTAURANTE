@@ -40,9 +40,11 @@ app.get('/receitas',(req, res)=>{
     res.json(DB.receitas);
 });
 
+
+//*********  Retorna a receita equivalente ao id da api  *********
 app.get('/receita/:id',(req, res)=>{
     const id = parseInt(req.params.id);
-    if (isNaN(id)){
+    if (isNaN(req.params.id)){
         res.sendStatus(400);
     }else {
         const receita = DB.receitas.find(receita => receita.id === id);
@@ -58,7 +60,67 @@ app.get('/receita/:id',(req, res)=>{
 })
 
 
+//*********  Cadastra de dados na api  *********
 
+app.post('/receita',(req, res)=>{
+    const {title, category, description} = req.body
+    if (!title || !category || !description){
+        res.sendStatus(400)
+    }else{
+        DB.receitas.push({
+            id:Math.ceil(Math.random()*1000),
+            title,
+            category,
+            description
+        });
+        res.sendStatus(200)
+    }
+})
+
+//*********  deleta dados na api  *********
+
+app.delete('/receita/:id',(req, res)=>{
+    const id = parseInt(req.params.id)
+    if (isNaN(req.params.id)){
+        res.sendStatus(400)
+    }else{
+       const index = DB.receitas.findIndex(receita =>  receita.id === id)
+        if (index === -1){
+            res.sendStatus(404);
+        }else {
+            DB.receitas.splice(index,1);
+            res.sendStatus(200)
+        }
+
+
+    }
+})
+
+//*********  atualiza os dados na api  *********
+
+app.put('/receita/:id', (req, res) => {
+    const id = parseInt(req.params.id)
+    if (isNaN(req.params.id)){
+        res.sendStatus(400)
+    }else {
+        const receita = DB.receitas.find(receita => receita.id === id)
+        if (!receita){
+            res.sendStatus(404)
+        }else {
+            const {title, category, description} = req.body;
+            if (title){
+                receita.title = title
+            }
+            if (category){
+                receita.category = category
+            }
+            if (description){
+                receita.description = description
+            }
+            res.sendStatus(200)
+        }
+    }
+})
 
 app.listen(PORT,()=>{
     console.log("API rodando na porta: ", PORT)
