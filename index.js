@@ -1,14 +1,22 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-const PORT = 8080
+const cors = require('cors')
+const PORT = process.env.PORT || 8080
 
-// db
+// DB
 const Receitas = require('./database/Receitas')
+const User = require('./database/users/Users')
 const {where} = require("sequelize");
 
+//Controllers
+const usersController = require('./database/users/usersController.js')
+
+
+app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use('/', usersController);
 
 //*********  Rotas da api  *********
 
@@ -52,7 +60,6 @@ app.post('/receita',(req, res)=>{
             description,
             category
         }).then(()=> res.sendStatus(200)).catch(err => console.log(err));
-
     }
 })
 
