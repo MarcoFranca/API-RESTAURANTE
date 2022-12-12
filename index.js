@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const auth = require('./middleware/authToken')
 const cors = require('cors')
 const PORT = process.env.PORT || 8080
 
@@ -22,15 +23,16 @@ app.use('/', usersController);
 
 //*********  Retorna todos os dados da api  *********
 
-app.get('/receitas',(req, res)=>{
+
+app.get('/receitas',auth,(req, res)=>{
     res.statusCode = 200;
-    Receitas.findAndCountAll().then(receitas => res.json(receitas)).catch(err => console.log(err))
+    Receitas.findAndCountAll().then(receitas => res.json({user:req.logedUser, receitas: receitas})).catch(err => console.log(err))
 });
 
 
 //*********  Retorna a receita equivalente ao id da api  *********
 
-app.get('/receita/:id',(req, res)=>{
+app.get('/receita/:id',auth,(req, res)=>{
     const id = parseInt(req.params.id);
     if (isNaN(req.params.id)){
         res.sendStatus(400);
@@ -50,7 +52,7 @@ app.get('/receita/:id',(req, res)=>{
 
 //*********  Cadastra de dados na api  *********
 
-app.post('/receita',(req, res)=>{
+app.post('/receita',auth,(req, res)=>{
     const {title, category, description} = req.body
     if (!title || !category || !description){
         res.sendStatus(400)
@@ -65,7 +67,7 @@ app.post('/receita',(req, res)=>{
 
 //*********  deleta dados na api  *********
 
-app.delete('/receita/:id',(req, res)=>{
+app.delete('/receita/:id',auth,(req, res)=>{
     const id = parseInt(req.params.id)
     if (isNaN(req.params.id)){
         res.sendStatus(400)
@@ -85,7 +87,7 @@ app.delete('/receita/:id',(req, res)=>{
 
 //*********  atualiza os dados na api  *********
 
-app.put('/receita/:id', (req, res) => {
+app.put('/receita/:id', auth,(req, res) => {
     const title = req.body.title
     const category = req.body.category
     const description = req.body.description

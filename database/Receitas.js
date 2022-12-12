@@ -17,4 +17,5 @@ const Receitas = connection.define('receitas',{
 
 })
 
+
 module.exports = Receitas;
